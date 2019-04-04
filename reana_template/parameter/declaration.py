@@ -183,6 +183,54 @@ def parameter_declaration(
     return para
 
 
+def set_defaults(obj):
+    """Set default values for parameter declaration if the respective element
+    is missing in the given object. It is assumed that the parameter identifier
+    is set in the given object.
+
+    Returns a (modified) copy of the given parameter declaration object.
+
+    Parameters
+    ----------
+    obj: dict
+        Dictionary containing a parameter declaration
+
+    Returns
+    -------
+    dict
+    """
+    para = dict(obj)
+    # Set name to identifier value if no name is present
+    set_value(para, LABEL_NAME, obj[LABEL_ID])
+    # Set data type to DT_STRING if no data type is present
+    set_value(para, LABEL_DATATYPE, DT_STRING)
+    # Set index to 0 if no parameter index is present
+    set_value(para, LABEL_INDEX, 0)
+    # Set required flag to True if not present
+    set_value(para, LABEL_REQUIRED, True)
+    # Set hidden flag to False if not present
+    set_value(para, LABEL_HIDDEN, False)
+    return para
+
+
+def set_value(parameter, key, value):
+    """Set the value for the parameter element with given key to the given value
+    if the element is currently not present in the parameter dictionary. If the
+    element with key is present no changes occur.
+
+    Parameters
+    ----------
+    parameter: dict
+        Dictionary containing a parameter declaration
+    key: string
+        Parameter element label
+    value: any
+        Default element value
+    """
+    if not key in parameter:
+        parameter[key] = value
+
+
 def validate_parameter(param_declaration):
     """Validate a given parameter declaration.
 

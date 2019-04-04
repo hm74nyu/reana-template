@@ -31,7 +31,7 @@ class TestLoadTemplate(TestCase):
         """Test loading a REANA workflow template that does contain template
         parameter declarations.
         """
-        template = REANATemplate.load('reana_template/tests/files/reana.tmpl')
+        template = REANATemplate.load('reana_template/tests/files/template.yaml')
         self.assertTrue(isinstance(template.workflow_spec, dict))
         self.assertEqual(len(template.parameters), 2)
 

@@ -15,7 +15,7 @@ template  parameters with the respective values in the value dictionary.
 """
 
 from reana_template.util import load_template
-from reana_template.parameter.declaration import validate_parameter
+from reana_template.parameter.declaration import set_defaults, validate_parameter
 
 
 """Labels for top-level elements in REANA Templates."""
@@ -46,11 +46,15 @@ class REANATemplate(object):
             validated against the parameter schema or not.
         """
         self.workflow_spec = workflow_spec
-        self.parameters = parameters if not parameters is None else list()
-        # Validate the template parameters if the validate flag is True
-        if validate:
-            for para in self.parameters:
-                validate_parameter(para)
+        # Add given parameter declaration to the parameters list. Ensure that
+        # all default values are set
+        self.parameters = list()
+        if not parameters is None:
+            for para in parameters:
+                # Validate the template parameters if the validate flag is True
+                if validate:
+                    validate_parameter(para)
+                self.parameters.append(set_defaults(para))
 
     @staticmethod
     def load(filename, validate=True):
