@@ -1,0 +1,39 @@
+properties:
+    datatype:
+        type: string
+    defaultValue:
+        oneOf:
+        -   type: boolean
+        -   type: string
+        -   type: number
+    description:
+        type: string
+    hidden:
+        type: boolean
+    id:
+        type: string
+    index:
+        type: number
+    name:
+        type: string
+    parent:
+        type: string
+    required:
+        type: boolean
+    values:
+        items:
+            properties:
+                isDefault:
+                    type: boolean
+                name:
+                    type: string
+                value:
+                    type: string
+            required:
+            - value
+            type: object
+        type: array
+required:
+- id
+type: object
+

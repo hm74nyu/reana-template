@@ -1,0 +1,2 @@
+jsonschema
+pyyaml>=5.1
