@@ -13,7 +13,7 @@ import json
 import sys
 import yaml
 
-from reana_template.parameter import PARAMETER_SCHEMA
+from reana_template.parameter.declaration import PARAMETER_SCHEMA
 
 
 # Command line usage string

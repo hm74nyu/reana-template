@@ -61,19 +61,32 @@ class REANATemplate(object):
                     pd.validate_parameter(para)
                 self.parameters[para[pd.LABEL_ID]] = pd.set_defaults(para)
 
-    def get_parameter(self, key):
-        """Get declaration for parameter with the given identifier.
+    def get_parameter(self, identifier):
+        """Short-cut to access the declaration for a parameter with the given
+        identifier.
 
         Parameters
         ----------
-        key: string
-            Parameter identifier
+        identifier: string
+            Unique parameter declaration identifier
 
         Returns
         -------
         dict
         """
-        return self.parameters.get(key)
+        return self.parameters.get(identifier)
+
+    def list_parameter(self):
+        """Get a sorted list of parameter declarations. Elements are sorted by
+        their index value. Ties are broken using the unique parameter
+        identifier.
+
+        Returns
+        -------
+        list
+        """
+        params = self.parameters.values()
+        return sorted(params, key=lambda p: (p[pd.LABEL_INDEX], p[pd.LABEL_ID]))
 
     @staticmethod
     def load(filename, validate=True):

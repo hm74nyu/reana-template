@@ -23,7 +23,6 @@ from jsonschema import validate, ValidationError
 LABEL_DATATYPE = 'datatype'
 LABEL_DEFAULT = 'defaultValue'
 LABEL_DESCRIPTION = 'description'
-LABEL_HIDDEN = 'hidden'
 LABEL_ID = 'id'
 LABEL_IS_DEFAULT = 'isDefault'
 LABEL_INDEX = 'index'
@@ -64,8 +63,7 @@ PARAMETER_SCHEMA = {
             {'type': 'string'},
             {'type': 'number'}
         ]},
-        LABEL_INDEX: {'type': 'number'},
-        LABEL_HIDDEN: {'type': 'boolean'}
+        LABEL_INDEX: {'type': 'number'}
     },
     'required': [LABEL_ID]
 }
@@ -126,7 +124,7 @@ def enum_value(value, text=None, is_default=False):
 
 def parameter_declaration(
         identifier, name=None, data_type=DT_STRING, index=0, required=True,
-        values=None, parent=None, default_value=None, hidden=False
+        values=None, parent=None, default_value=None
     ):
     """Create a dictionary that contains a module parameter specification.
 
@@ -153,9 +151,6 @@ def parameter_declaration(
     default_value: bool, string, number, optional
         Optional default value for a scalar parameter. Default values for file
         parameters are ignored.
-    hidden: bool, optional
-        Defines if the parameter is visible or hidden when rendering a front-end
-        input form
 
     Returns
     -------
@@ -170,8 +165,7 @@ def parameter_declaration(
         LABEL_NAME: name if not name is None else identifier,
         LABEL_DATATYPE: data_type,
         LABEL_INDEX: index,
-        LABEL_REQUIRED: required,
-        LABEL_HIDDEN: hidden
+        LABEL_REQUIRED: required
     }
     if not values is None:
         para[LABEL_VALUES] = values
@@ -208,8 +202,6 @@ def set_defaults(obj):
     set_value(para, LABEL_INDEX, 0)
     # Set required flag to True if not present
     set_value(para, LABEL_REQUIRED, True)
-    # Set hidden flag to False if not present
-    set_value(para, LABEL_HIDDEN, False)
     return para
 
 

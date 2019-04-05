@@ -8,8 +8,6 @@ properties:
         -   type: number
     description:
         type: string
-    hidden:
-        type: boolean
     id:
         type: string
     index:
@@ -28,7 +26,10 @@ properties:
                 name:
                     type: string
                 value:
-                    type: string
+                    oneOf:
+                    -   type: boolean
+                    -   type: string
+                    -   type: number
             required:
             - value
             type: object

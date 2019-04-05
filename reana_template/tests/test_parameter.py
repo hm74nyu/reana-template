@@ -54,8 +54,7 @@ class TestParameterValidation(TestCase):
                 para.enum_value(value=3, text='THREE', is_default=True)
             ],
             parent='DEF',
-            default_value=5,
-            hidden=True
+            default_value=5
         )
         self.assertTrue(isinstance(pd, dict))
         self.assertEqual(pd.get(para.LABEL_ID), 'ABC')
@@ -63,7 +62,6 @@ class TestParameterValidation(TestCase):
         self.assertEqual(pd.get(para.LABEL_DATATYPE), para.DT_INTEGER)
         self.assertEqual(pd.get(para.LABEL_INDEX), 10)
         self.assertFalse(pd.get(para.LABEL_REQUIRED))
-        self.assertTrue(pd.get(para.LABEL_HIDDEN))
         self.assertEqual(pd.get(para.LABEL_PARENT), 'DEF')
         self.assertEqual(pd.get(para.LABEL_DEFAULT), 5)
         # Valudate value enumeration
@@ -81,7 +79,7 @@ class TestParameterValidation(TestCase):
         """
         # Expect to get a dictionary that contains the identifier, name (both
         # equal to 'ABC'), a data type DT_STRING, an index of 0. The required
-        # and hidden flags are True and False, respectively.
+        #  flag is True.
         pd = para.parameter_declaration(identifier='ABC')
         self.assertTrue(isinstance(pd, dict))
         self.assertEqual(pd.get(para.LABEL_ID), 'ABC')
@@ -89,7 +87,6 @@ class TestParameterValidation(TestCase):
         self.assertEqual(pd.get(para.LABEL_DATATYPE), para.DT_STRING)
         self.assertEqual(pd.get(para.LABEL_INDEX), 0)
         self.assertTrue(pd.get(para.LABEL_REQUIRED))
-        self.assertFalse(pd.get(para.LABEL_HIDDEN))
         # All other optional elements of the declaration are missing
         self.assertFalse(para.LABEL_DEFAULT in pd)
         self.assertFalse(para.LABEL_PARENT in pd)
@@ -129,11 +126,6 @@ class TestParameterValidation(TestCase):
         # Invalid data type for parameter required
         pd_invalid = dict(pd)
         pd_invalid[para.LABEL_REQUIRED] = '12'
-        with self.assertRaises(ValueError):
-            para.validate_parameter(pd_invalid)
-        # Invalid data type for parameter hidden
-        pd_invalid = dict(pd)
-        pd_invalid[para.LABEL_HIDDEN] = 12
         with self.assertRaises(ValueError):
             para.validate_parameter(pd_invalid)
 
