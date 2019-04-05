@@ -14,6 +14,8 @@ from unittest import TestCase
 from reana_template import REANATemplate
 from reana_template.util import load_template
 
+import reana_template.parameter.declaration as pd
+
 
 class TestLoadTemplate(TestCase):
     def test_load_file(self):
@@ -34,6 +36,14 @@ class TestLoadTemplate(TestCase):
         template = REANATemplate.load('reana_template/tests/files/template.yaml')
         self.assertTrue(isinstance(template.workflow_spec, dict))
         self.assertEqual(len(template.parameters), 2)
+        # Code file parameter
+        p_code = template.get_parameter('codeFile')
+        self.assertEqual(p_code[pd.LABEL_NAME], 'Code File')
+        self.assertEqual(p_code[pd.LABEL_DATATYPE], pd.DT_FILE)
+        # Sleep time parameter
+        p_sleep = template.get_parameter('sleeptime')
+        self.assertEqual(p_sleep[pd.LABEL_NAME], 'sleeptime')
+        self.assertEqual(p_sleep[pd.LABEL_DATATYPE], pd.DT_INTEGER)
 
     def test_load_simple_template(self):
         """Test loading a simple REANA workflow template that does not contain

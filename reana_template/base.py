@@ -15,7 +15,8 @@ template  parameters with the respective values in the value dictionary.
 """
 
 from reana_template.util import load_template
-from reana_template.parameter.declaration import set_defaults, validate_parameter
+
+import reana_template.parameter.declaration as pd
 
 
 """Labels for top-level elements in REANA Templates."""
@@ -25,7 +26,8 @@ LABEL_WORKFLOW = 'workflow'
 
 class REANATemplate(object):
     """A REANA workflow template contains a REANA workflow specification and
-    a list of template parameter declarations.
+    a dictionary of template parameter declarations. Parameter declarations are
+    keyed by heir unique identifier in the dictionary.
     """
     def __init__(self, workflow_spec, parameters=None, validate=False):
         """Initialize the workflow specification and the list of template
@@ -34,6 +36,9 @@ class REANATemplate(object):
         If the valid flag is True all given template parameter declarations are
         validated against the parameter schema. Raises ValueError if any of
         the given parameter declarations fails the validation.
+
+        Raises ValueError if the identifier for the given parameter declarations
+        are not unique.
 
         Parameters
         ----------
@@ -48,13 +53,27 @@ class REANATemplate(object):
         self.workflow_spec = workflow_spec
         # Add given parameter declaration to the parameters list. Ensure that
         # all default values are set
-        self.parameters = list()
+        self.parameters = dict()
         if not parameters is None:
             for para in parameters:
                 # Validate the template parameters if the validate flag is True
                 if validate:
-                    validate_parameter(para)
-                self.parameters.append(set_defaults(para))
+                    pd.validate_parameter(para)
+                self.parameters[para[pd.LABEL_ID]] = pd.set_defaults(para)
+
+    def get_parameter(self, key):
+        """Get declaration for parameter with the given identifier.
+
+        Parameters
+        ----------
+        key: string
+            Parameter identifier
+
+        Returns
+        -------
+        dict
+        """
+        return self.parameters.get(key)
 
     @staticmethod
     def load(filename, validate=True):
