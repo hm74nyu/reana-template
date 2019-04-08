@@ -20,6 +20,14 @@ reana\_template.base module
     :undoc-members:
     :show-inheritance:
 
+reana\_template.scanner module
+------------------------------
+
+.. automodule:: reana_template.scanner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 reana\_template.util module
 ---------------------------
 

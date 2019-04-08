@@ -26,6 +26,23 @@ parameters:
     - id: codeFile
       name: 'Code File'
       datatype: file
+      index: 0
     - id: sleeptime
+      name: Sleep period (in sec)
       datatype: int
       defaultValue: 10
+      index: 1
+    - id: output
+      datatype: record
+      defaultValue: 10
+      index: 2
+    - id: outputType
+      datatype: int
+      defaultValue: 5
+      parent: output
+      index: 4
+    - id: outputTarget
+      datatype: file
+      defaultValue: 'data/output.txt'
+      parent: output
+      index: 3

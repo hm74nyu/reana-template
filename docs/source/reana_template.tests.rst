@@ -20,6 +20,22 @@ reana\_template.tests.test\_parameter module
     :undoc-members:
     :show-inheritance:
 
+reana\_template.tests.test\_read\_arguments module
+--------------------------------------------------
+
+.. automodule:: reana_template.tests.test_read_arguments
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+reana\_template.tests.test\_scanner module
+------------------------------------------
+
+.. automodule:: reana_template.tests.test_scanner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 reana\_template.tests.test\_template module
 -------------------------------------------
 

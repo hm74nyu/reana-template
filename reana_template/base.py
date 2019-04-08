@@ -15,6 +15,7 @@ template  parameters with the respective values in the value dictionary.
 """
 
 from reana_template.parameter import TemplateParameter
+from reana_template.scanner import Scanner
 from reana_template.util import load_template
 
 import reana_template.parameter.declaration as pd
@@ -175,6 +176,77 @@ class REANATemplate(object):
             validate=validate
         )
 
+    def read(self, scanner=None):
+        """Read values for each of the template parameter using a given input
+        scanner. If no scanner is given values are read from standard input.
+
+        Returns a dictionary of argument values that can be passed to the
+        get_workflow_spec() method to get a valid REANA workflow specification.
+
+        Parameters
+        ----------
+        scanner: reana_template.scanner.Scanner
+            Input scanner to read parameter values
+
+        Returns
+        -------
+        dict
+        """
+        sc = scanner if not scanner is None else Scanner()
+        arguments = dict()
+        for para in self.list_parameter():
+            # Skip nested parameter
+            if not para.parent is None:
+                continue
+            if para.is_list():
+                raise ValueError('lists are not supported yet')
+            elif para.is_record():
+                # A record can only appear once and all record children have
+                # global unique identifier. Thus, we can add values for each
+                # of the children directly to the arguments dictionary
+                print(para.name)
+                for child in para.children:
+                    val = self.read_parameter(child, sc, prompt_prefix='  ')
+                    if not val is None:
+                        arguments[child.identifier] = val
+            else:
+                val = self.read_parameter(para, sc)
+                if not val is None:
+                    arguments[para.identifier] = val
+        return arguments
+
+    def read_parameter(self, para, scanner, prompt_prefix=''):
+        """Read value for a given template parameter declaration. Prompts the
+        user to enter a value for the given parameter and returns the converted
+        value that was entered by the user.
+
+        Parameters
+        ----------
+        para: reana_template.parameter.TemplateParameter
+            REANA workflow template parameter declaration
+
+        Returns
+        -------
+        bool or float or int or string or list
+        """
+        done = False
+        while not done:
+            done = True
+            print(prompt_prefix + para.prompt(), end='')
+            try:
+                if para.is_bool():
+                    return scanner.next_bool(default_value=para.default_value)
+                elif para.is_file():
+                    return scanner.next_file(default_value=para.default_value)
+                elif para.is_float():
+                    return scanner.next_float(default_value=para.default_value)
+                elif para.is_int():
+                    return scanner.next_int(default_value=para.default_value)
+                else:
+                    return scanner.next_string(default_value=para.default_value)
+            except ValueError as ex:
+                print(ex)
+                done = False
 
 # ------------------------------------------------------------------------------
 # Helper Methods
