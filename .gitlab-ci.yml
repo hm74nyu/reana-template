@@ -3,4 +3,4 @@ py36_nose:
   script:
     - apt-get update -q -y
     - pip install -r requirements.txt
-    - nosetests -v --nocapture
+    - python setup.py test
