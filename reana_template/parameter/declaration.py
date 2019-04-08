@@ -123,8 +123,8 @@ def enum_value(value, text=None, is_default=False):
 
 
 def parameter_declaration(
-        identifier, name=None, data_type=DT_STRING, index=0, required=True,
-        values=None, parent=None, default_value=None
+        identifier, name=None, data_type=DT_STRING, description=None, index=0,
+        required=True, values=None, parent=None, default_value=None
     ):
     """Create a dictionary that contains a module parameter specification.
 
@@ -139,6 +139,9 @@ def parameter_declaration(
         Printable parameter name. The default value is the parameter identifier.
     data_type: string, optional
         Parameter type. The default value is DT_STRING
+    description: string, optional
+        Optional text providing a more comprehensive description for the
+        parameter. Default is the parameter name.
     index: int, optional
         Index position of argument in input form. The default value is 0.
     required: bool, optional
@@ -167,6 +170,11 @@ def parameter_declaration(
         LABEL_INDEX: index,
         LABEL_REQUIRED: required
     }
+    # Set optional properties
+    if not description is None:
+        para[LABEL_DESCRIPTION] = description
+    else:
+        para[LABEL_DESCRIPTION] = para[LABEL_NAME]
     if not values is None:
         para[LABEL_VALUES] = values
     if not parent is None:
@@ -198,6 +206,8 @@ def set_defaults(obj):
     set_value(para, LABEL_NAME, obj[LABEL_ID])
     # Set data type to DT_STRING if no data type is present
     set_value(para, LABEL_DATATYPE, DT_STRING)
+    # Set description to name value if no description is present
+    set_value(para, LABEL_DESCRIPTION, para[LABEL_NAME])
     # Set index to 0 if no parameter index is present
     set_value(para, LABEL_INDEX, 0)
     # Set required flag to True if not present

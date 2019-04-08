@@ -2,13 +2,13 @@ workflow:
     version: 0.3.0
     inputs:
       files:
-        - $[codeFile]
+        - $[[codeFile]]
         - data/names.txt
       parameters:
-        helloworld: $[codeFile]
+        helloworld: $[[codeFile]]
         inputfile: data/names.txt
         outputfile: results/greetings.txt
-        sleeptime: $[sleeptime]
+        sleeptime: $[[sleeptime]]
     workflow:
       type: serial
       specification:

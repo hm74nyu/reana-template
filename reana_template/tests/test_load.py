@@ -38,12 +38,12 @@ class TestLoadTemplate(TestCase):
         self.assertEqual(len(template.parameters), 2)
         # Code file parameter
         p_code = template.get_parameter('codeFile')
-        self.assertEqual(p_code[pd.LABEL_NAME], 'Code File')
-        self.assertEqual(p_code[pd.LABEL_DATATYPE], pd.DT_FILE)
+        self.assertEqual(p_code.name, 'Code File')
+        self.assertEqual(p_code.data_type, pd.DT_FILE)
         # Sleep time parameter
         p_sleep = template.get_parameter('sleeptime')
-        self.assertEqual(p_sleep[pd.LABEL_NAME], 'sleeptime')
-        self.assertEqual(p_sleep[pd.LABEL_DATATYPE], pd.DT_INTEGER)
+        self.assertEqual(p_sleep.name, 'sleeptime')
+        self.assertEqual(p_sleep.data_type, pd.DT_INTEGER)
 
     def test_load_simple_template(self):
         """Test loading a simple REANA workflow template that does not contain

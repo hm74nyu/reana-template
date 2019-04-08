@@ -14,6 +14,7 @@ create a valid REANA workflow specification by replacing the references to
 template  parameters with the respective values in the value dictionary.
 """
 
+from reana_template.parameter import TemplateParameter
 from reana_template.util import load_template
 
 import reana_template.parameter.declaration as pd
@@ -27,7 +28,7 @@ LABEL_WORKFLOW = 'workflow'
 class REANATemplate(object):
     """A REANA workflow template contains a REANA workflow specification and
     a dictionary of template parameter declarations. Parameter declarations are
-    keyed by heir unique identifier in the dictionary.
+    keyed by their unique identifier in the dictionary.
     """
     def __init__(self, workflow_spec, parameters=None, validate=False):
         """Initialize the workflow specification and the list of template
@@ -59,7 +60,28 @@ class REANATemplate(object):
                 # Validate the template parameters if the validate flag is True
                 if validate:
                     pd.validate_parameter(para)
-                self.parameters[para[pd.LABEL_ID]] = pd.set_defaults(para)
+                # Create a TemplateParameter instance for the parameter. Keep
+                # track of children for parameter that are of type DT_LIST or
+                # DT_RECORD. Childrens are added after all parameters have been
+                # instantiated.
+                p_id = para[pd.LABEL_ID]
+                # Raise ValueError if the parameter identifier is not unique
+                if p_id in self.parameters:
+                    raise ValueError('parameter \'' + str(p_id) + '\'  not unique')
+                c = None
+                if para[pd.LABEL_DATATYPE] in [pd.DT_LIST, pd.DT_RECORD]:
+                    c = list()
+                tp = TemplateParameter(pd.set_defaults(para), children=c)
+                self.parameters[p_id] = tp
+            # Add parameter templates to the list of children for their
+            # respective parent (if given). We currently only support one level
+            # of nesting.
+            for para in parameters:
+                if pd.LABEL_PARENT in para:
+                    p_id = para[pd.LABEL_ID]
+                    parent = para[pd.LABEL_PARENT]
+                    if not parent is None:
+                        self.parameters[parent].add_child(self.parameters[p_id])
 
     def get_parameter(self, identifier):
         """Short-cut to access the declaration for a parameter with the given
@@ -76,6 +98,35 @@ class REANATemplate(object):
         """
         return self.parameters.get(identifier)
 
+    def get_workflow_spec(self, arguments):
+        """Get REANA workflow specification where template parameters are
+        replaced by the given arguments.
+
+        Raises ValueError if for any of the mandatory template parameters no
+        value is given in the arguments dictionary (and no default value is
+        defined in the parameter declaration).
+
+        Parameters
+        ----------
+        arguments: dict
+            Dictionary that associates template parameter identifiers with
+            argument values
+
+        Returns
+        -------
+        dict
+        """
+        # Raise ValueError if a parameter is required and no argument is given
+        # or default value defined
+        for para in self.parameters.values():
+            if para.is_required and para.default_value is None:
+                if not para.identifier in arguments:
+                    raise ValueError('missing value for mandatory parameter \'' + str(para.identifier) + '\'')
+        # Replace template parameter references in the workflow specification
+        # with respective values in the argument dictionary or their defined
+        # default value
+        return replace_args(self.workflow_spec, arguments, self.parameters)
+
     def list_parameter(self):
         """Get a sorted list of parameter declarations. Elements are sorted by
         their index value. Ties are broken using the unique parameter
@@ -86,7 +137,7 @@ class REANATemplate(object):
         list
         """
         params = self.parameters.values()
-        return sorted(params, key=lambda p: (p[pd.LABEL_INDEX], p[pd.LABEL_ID]))
+        return sorted(params, key=lambda p: (p.index, p.identifier))
 
     @staticmethod
     def load(filename, validate=True):
@@ -123,3 +174,100 @@ class REANATemplate(object):
             parameters=obj.get(LABEL_PARAMETERS),
             validate=validate
         )
+
+
+# ------------------------------------------------------------------------------
+# Helper Methods
+# ------------------------------------------------------------------------------
+
+def replace_args(spec, arguments, parameters):
+    """Replace template parameter references in the workflow specification
+    dictionary with their respective values in the argument dictionary or their
+    defined default value.
+
+    Returns a modified dictionary.
+
+    Parameters
+    ----------
+    spec: dict
+        (Part of the) workflow specification for a REANA template
+    arguments: dict
+        Dictionary that associates template parameter identifiers with
+        argument values
+    parameters: dict(reana_template.parameter.TemplateParameter)
+        Dictionary of parameter declarations for a REANA template
+
+    Returns
+    -------
+    dict
+    """
+    # The new object will contain the modified workflow specification
+    obj = dict()
+    for key in spec:
+        val = spec[key]
+        # Modify the value that is currently associated with key according to
+        # the value type
+        if isinstance(val, str):
+            # If the value is of type string we need to test whether the string
+            # is a reference to a template parameter and (if True) replace the
+            # value with the given argument or default value.
+            val = replace_value(val, arguments, parameters)
+        elif isinstance(val, dict):
+            # Recursive call to replace_args if the value is a dictionary
+            val = replace_args(val, arguments, parameters)
+        elif isinstance(val, list):
+            # Create modified list where each list element is modified depending
+            # on its type.
+            modified_list = list()
+            for list_val in val:
+                if isinstance(list_val, str):
+                    # Replace potential references to template parameters in
+                    # list elements of type string.
+                    list_val = replace_value(list_val, arguments, parameters)
+                elif isinstance(list_val, dict):
+                    # Recursive replace for dictionaries
+                    list_val = replace_args(list_val, arguments, parameters)
+                elif isinstance(list_val, list):
+                    # We currently do not support lists of lists
+                    raise ValueError('nested lists not supported')
+                modified_list.append(list_val)
+            val = modified_list
+        # If the modified value is null the key is omitted from the resulting
+        # workflow specification
+        if not val is None:
+            obj[key] = val
+    return obj
+
+
+def replace_value(value, arguments, parameters):
+    """Test whether the string is a reference to a template parameter and (if
+    True) replace the value with the given argument or default value.
+
+    In the current implementation template parameters are referenced using
+    $[[..]] syntax.
+
+    Parameters
+    ----------
+    value: string
+        String value in the workflow specification for a REANA template
+    arguments: dict
+        Dictionary that associates template parameter identifiers with
+        argument values
+    parameters: dict(reana_template.parameter.TemplateParameter)
+        Dictionary of parameter declarations for a REANA template
+
+    Returns
+    -------
+    string
+    """
+    # Check ff the value matches the template parameter reference pattern
+    if value.startswith('$[[') and value.endswith(']]'):
+        # Extract variable name. If arguments contains a value for the variable
+        # we return the associated value from the dictionary. Otherwise, the
+        # parameter default value is returned
+        var = value[3:-2]
+        if var in arguments:
+            return arguments[var]
+        return parameters[var].default_value
+    else:
+        return value

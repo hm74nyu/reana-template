@@ -18,6 +18,15 @@ tests_require = [
 ]
 
 
+extras_require = {
+    'docs': [
+        'Sphinx',
+        'sphinx-rtd-theme'
+    ],
+    'tests': tests_require,
+}
+
+
 setup(
     name='reana-template',
     version='0.1.0',
@@ -25,6 +34,7 @@ setup(
     license='MIT',
     packages=['reana_template'],
     test_suite='nose.collector',
+    extras_require=extras_require,
     tests_require=tests_require,
     install_requires=install_requires
 )
