@@ -1,7 +1,0 @@
-py36_tests:
-  image: python:3.6
-  script:
-    - apt-get update -q -y
-    - pip install -r requirements.txt
-    - pip install -e .
-    - python setup.py test
