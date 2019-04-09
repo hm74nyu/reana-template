@@ -9,6 +9,7 @@ from standard input.
 """
 
 from abc import abstractmethod
+from builtins import input
 
 
 class Scanner(object):

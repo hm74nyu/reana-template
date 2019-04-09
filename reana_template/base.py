@@ -14,7 +14,9 @@ create a valid REANA workflow specification by replacing the references to
 template  parameters with the respective values in the value dictionary.
 """
 
-from reana_template.parameter import TemplateParameter
+from __future__ import print_function
+
+from reana_template.parameter.base import TemplateParameter
 from reana_template.scanner import Scanner
 from reana_template.util import load_template
 
