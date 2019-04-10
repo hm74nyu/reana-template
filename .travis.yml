@@ -9,9 +9,9 @@ python:
 install:
   - pip install -r requirements.txt
   - python setup.py install
+  - pip install coverage
 
 script:
-  - python setup.py test
   - coverage run --source=reana_template setup.py test
 
 after_success:
