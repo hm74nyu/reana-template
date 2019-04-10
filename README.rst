@@ -6,6 +6,10 @@ REANA Workflow Templates
    :target: https://travis-ci.org/hm74nyu/reana-template.svg?branch=master
 
 
+
+About
+=====
+
 **REANA Workflow Templates** are parameterized workflow specifications for the `Reproducible research data analysis platform (REANA) <http://reanahub.io/>`_. Workflow templates are primarily intended for settings where users are allowed to run pre-defined REANA workflows using their own input files and parameters.
 
 
