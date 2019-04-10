@@ -5,6 +5,9 @@ REANA Workflow Templates
 .. image:: https://img.shields.io/travis/reanahub/reana-cluster.svg
    :target: https://travis-ci.org/hm74nyu/reana-template.svg?branch=master
 
+.. image:: https://coveralls.io/repos/github/hm74nyu/reana-template/badge.svg?branch=master
+   :target: https://coveralls.io/github/hm74nyu/reana-template?branch=master
+
 
 
 About
